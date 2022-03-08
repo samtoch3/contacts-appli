@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="contacts-ear">
+        <wb-resource deploy-path="/" source-path="/EarContent" tag="defaultRootSource"/>
+        <dependent-module archiveName="contacts-ejbs.jar" deploy-path="/" handle="module:/resource/contacts-ejbs/contacts-ejbs">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="contacts-commun.jar" deploy-path="/lib" handle="module:/resource/contacts-commun/contacts-commun">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="mapstruct-1.4.2.Final.jar" deploy-path="/lib" handle="module:/classpath/lib/C:/TEMP/maven-repository/org/mapstruct/mapstruct/1.4.2.Final/mapstruct-1.4.2.Final.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+    </wb-module>
+</project-modules>

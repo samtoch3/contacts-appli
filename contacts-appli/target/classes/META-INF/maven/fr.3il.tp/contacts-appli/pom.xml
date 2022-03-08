@@ -1,0 +1,76 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>fr.3il.tp</groupId>
+		<artifactId>contacts</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../contacts</relativePath>
+	</parent>
+	<artifactId>contacts-appli</artifactId>
+
+	<properties>
+		<exec.mainClass>contacts.AppliContacts$Main</exec.mainClass>
+	</properties>
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>fr.3il.tp</groupId>
+			<artifactId>contacts-commun</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.3il.tp</groupId>
+			<artifactId>contacts-emb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>fr.3il.tp</groupId>
+			<artifactId>contacts-gui</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jfox</groupId>
+			<artifactId>jfox</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.3.1</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+		</dependency>
+	</dependencies>
+
+</project>

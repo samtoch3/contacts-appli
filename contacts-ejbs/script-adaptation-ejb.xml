@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+	 12/2021														
+
+	 adaptation-ejb	
+	 Adapte les classes des couches Service et DAO
+	 pour être utilisées en tant qu'EJB
+
+	 E. Amblard
+	 ====================================================================== -->
+
+<project name="adaptation-ejb" >
+
+
+	<!-- =================================
+		  Paramètres généraux
+		 ================================= -->
+	
+	<property name="dir.src.ejb" location="src/main/java/contacts/ejb" />
+	<property name="dir.src.service" location="${dir.src.ejb}/service/standard"/>
+	<property name="dir.src.dao" location="${dir.src.ejb}/dao/jpa"/>
+
+	<fileset dir="${dir.src.service}" id="services">
+		<include name="Service*.java"/>
+	</fileset>
+
+	<fileset dir="${dir.src.dao}" id="daos">
+		<include name="Dao*.java"/>
+	</fileset>
+	
+	
+	<!-- =================================
+		  target: adapter-services
+		 ================================= -->
+	<target name="adapter-services"  description="">
+
+		<!-- managerSecurite -> managerSecurity -->
+		<replace token="managerSecurite" value="managerSecurity" >
+			<fileset refid="services" />
+		</replace>
+		
+		<!-- Supprime clauses import -->
+		<supprimer-ligne token="org.springframework.stereotype.Component" fileset="daos" />
+		<supprimer-ligne token="org.springframework.stereotype.Component" fileset="services" />
+		<supprimer-ligne token="import javax.inject.Named;" fileset="services" />
+		<supprimer-ligne token="import contacts.ejb.dao.IManagerTransaction;" fileset="services" />
+		<supprimer-ligne token="import contacts.ejb.service.util.IManagerSecurity;" fileset="services" />
+		<supprimer-ligne token="import contacts.ejb.service.util.UtilServices;" fileset="services" />
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n\r?\n\r?\n(\r?\nimport)" />
+			<substitution expression="\1"/>
+			<fileset refid="daos" />
+		</replaceregexp>
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n\r?\n\r?\n(\r?\nimport)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n\r?\n(\r?\n\r?\n\r?\n)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+
+		<!-- Annotations spécifiques à Spring -->
+		<replace token="@Named" value="@Component"  ><fileset refid="services" /></replace>
+		<commenter token="@Component" fileset="daos" />
+		<commenter token="@Component" fileset="services" />
+		
+		<!-- Méthodes injecteurs -->
+		<supprimer-bloc token="setDao"		fileset="services" />
+		<supprimer-bloc token="setManager"	fileset="services" />
+		<supprimer-bloc token="setMapper"	fileset="services" />
+		<supprimer-ligne token="this.mapper"		fileset="services" />
+		<supprimer-ligne token="this.dao"			fileset="services" />
+		<supprimer-ligne token="this.managerSecuritY"	fileset="services" />
+		<supprimer-ligne token="this.managerTransaction"	fileset="services" />
+		<replaceregexp flags="gis">
+			<regexp pattern="// Injecteurs.*(// Actions)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		
+		<!-- Commente logger -->
+		<commenter token="Logger"			fileset="services" />
+  	
+		<commenter-inject token="IManagerSecurity"	fileset="services" />
+		<commenter-inject token="IManagerTransaction"	fileset="services" />
+		
+		<commenter token="managerDao"	fileset="services" />
+		<commenter-fleche token="managerSecurity.verif" fileset="services" />
+		<commenter token="managerSecurity.setCompte"	fileset="services" />
+		<commenter token="IManagerSecurity"	fileset="services" />
+		<commenter token="UtilServices"		fileset="services" />
+		<commenter token="managerTransaction"	fileset="services" />
+		<commenter token="IManagerTransaction"	fileset="services" />
+		<commenter-try-catch				fileset="services"/>
+		<normaliser-slashes					fileset="services"  />
+		<commenter-bloc-fleche token="managerSecurity.getIdCompteActif"	fileset="services" />
+		<commenter-fleche token="supprimer le compte"			fileset="services" />
+	</target>
+	
+	
+	<!-- =================================
+		  target: nettoyer-services
+		 ================================= -->
+	<target name="nettoyer-services"  description="">
+		
+		<supprimer token="// Logger" fileset="services"/>
+		
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n[ \t]*(\r?\n//)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n//[^\r\n]*\r?\n[ \t]*(\r?\n)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n\t// Injecteurs[^\r\n]*\r?\n[ \t]*(\r?\n)" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+
+		<replaceregexp flags="gis">
+			<regexp pattern="\r?\n//\s.*?(\r?\n[^/])" />
+			<substitution expression="\1"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		
+		<replaceregexp flags="gis">
+			<regexp pattern="(\r?\n\s*?\r?\n)\s*(\r?\n)" />
+			<substitution expression="\1\2"/>
+			<fileset refid="services" />
+		</replaceregexp>
+		
+	</target>
+	
+	
+	<!-- =================================
+		  target: type-transaction-daos
+		 ================================= -->
+<!--
+	<target name="type-transaction-daos"  description="">
+
+		<ajouter-type-transaction fileset="daos"/>
+
+	</target>
+-->
+	
+	
+	<!-- =================================
+		  target: type-transaction-services
+		 ================================= -->
+<!--
+	<target name="type-transaction-services"  description="">
+
+		<ajouter-type-transaction fileset="services"/>
+
+	</target>
+-->
+	
+
+	<!-- - - - - - - - - - - - - - - - - -
+		  macroderf: commenter
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+			
+			<replaceregexp byline="true">
+				<regexp pattern="(.*@{token}.*)"/>
+				<substitution expression="//\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+
+		</sequential>
+	</macrodef>
+	
+
+	<!-- - - - - - - - - - - - - - - - - -
+		  macroderf: commenter-fleche
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-fleche">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+			
+			<replaceregexp byline="true">
+				<regexp pattern="\s(.*@{token}.*)"/>
+				<substitution expression="//--->\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - -
+		  macroderf: commenter-inject
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-inject">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+
+			<replaceregexp flags="gis">
+				<regexp pattern="([ \t]*\@Inject\s+?private\s+?@{token})"/>
+				<substitution expression="//\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+ 
+		</sequential>
+	</macrodef>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: commenter-si-debut
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-si-debut">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+			
+			<replaceregexp byline="true">
+				<regexp pattern="(^\s*@{token}.*)"/>
+				<substitution expression="//\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: commenter-try-catch
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-try-catch">
+		<attribute name="fileset" />
+		<sequential>
+
+			<!-- try -->
+ 			<commenter fileset="@{fileset}" token="\stry\s"/>
+			<!-- catch -->
+			<commenter fileset="@{fileset}" token="\scatch\s"/>
+
+			<!-- 1ère ligne qui suit le catch -->
+<!--
+			<replaceregexp flags="gis">
+				<regexp pattern="(catch.+?\r?\n)"/>
+				<substitution expression="\1//"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+ -->			
+			<!-- 2ème ligne qui suit le catch -->
+<!--
+			<replaceregexp flags="gis">
+				<regexp pattern="(catch.+?\r?\n.+?\r?\n)"/>
+				<substitution expression="\1//"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+-->			
+			<!-- } qui suit le catch -->
+			<replaceregexp flags="gis">
+				<regexp pattern="(catch.+?\r?\n)(\t+?})"/>
+				<substitution expression="\1//\2"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: commenter-bloc
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-bloc">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+
+ 			<commenter token="@{token}" fileset="@{fileset}"/>
+
+			<replaceregexp flags="gis">
+				<regexp pattern="(@{token}.+?)([ \t]+})"/>
+				<substitution expression="\1//\2"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+ 
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: commenter-bloc-fleche
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="commenter-bloc-fleche">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+
+ 			<commenter-fleche token="@{token}" fileset="@{fileset}"/>
+
+			<replaceregexp flags="gis">
+				<regexp pattern="(@{token}.+?)\t([ \t]+})"/>
+				<substitution expression="\1//--->\2"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+ 
+		</sequential>
+	</macrodef>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: normaliser-slashes
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="normaliser-slashes">
+		<attribute name="fileset" />
+		<sequential>
+			
+			<replaceregexp byline="true">
+				<regexp pattern="^//*/"/>
+				<substitution expression="//"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+			
+			<replaceregexp byline="true">
+				<regexp pattern="// //"/>
+				<substitution expression="//"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+
+		</sequential>
+	</macrodef>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: supprimer
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="supprimer">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+			<replace token="@{token}" value="">
+				<fileset refid="@{fileset}" />
+			</replace>
+		</sequential>
+	</macrodef>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: supprimer-ligne
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="supprimer-ligne">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+			<replaceregexp byline="true">
+				<regexp pattern="(.*@{token}.*)"/>
+				<substitution expression=""/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: supprimer-bloc
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="supprimer-bloc">
+		<attribute name="token" />
+		<attribute name="fileset" />
+		<sequential>
+
+			<replaceregexp flags="gis">
+				<regexp pattern="(@{token}.+?)([ \t]+?\})"/>
+				<substitution expression="\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>
+			
+			<supprimer-ligne token="@{token}" fileset="@{fileset}" />
+ 
+		</sequential>
+	</macrodef>
+
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+		  macroderf: ajouter-type-transaction
+		 - - - - - - - - - - - - - - - - - -->
+
+	<macrodef name="ajouter-type-transaction">
+		<attribute name="fileset" />
+		<sequential>
+		
+			<!-- Ajoute @TransactionAttribute(NOT_SUPPORTED) à chaque méthode public -->
+			<replaceregexp flags="gis">
+				<regexp pattern="([ \t]+@Override)(\s+?public)"/>
+				<substitution expression="\1${line.separator}	@TransactionAttribute(NOT_SUPPORTED)\2"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+			
+			<!-- Ajoute les clauses import -->
+			<replaceregexp flags="is">
+				<regexp pattern="(import)"/>
+				<substitution expression="import javax.ejb.TransactionAttribute;${line.separator}import static javax.ejb.TransactionAttributeType.*;${line.separator}\1"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>		
+			
+			<!-- Supprimee les clauses import en double -->
+			<replaceregexp flags="is">
+				<regexp pattern="import javax.ejb.TransactionAttribute;.+import static javax.ejb.TransactionAttributeType.\*;"/>
+				<substitution expression="import javax.ejb.TransactionAttribute;${line.separator}import static javax.ejb.TransactionAttributeType.*;"/>
+				<fileset refid="@{fileset}" />
+			</replaceregexp>
+			
+		</sequential>
+	</macrodef>
+	
+	
+</project>
